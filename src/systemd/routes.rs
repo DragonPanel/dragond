@@ -1,8 +1,5 @@
-use crate::{
-  api_errors::ApiError,
-  AppState, systemd::functions,
-};
-use actix_web::{get, web, HttpResponse, Responder, http::header::ContentType};
+use crate::{api_errors::ApiError, systemd::functions, AppState};
+use actix_web::{get, http::header::ContentType, web, HttpResponse, Responder};
 
 #[get("/load-unit/{name}")]
 async fn load_unit(
@@ -18,14 +15,12 @@ async fn load_unit(
   Ok(
     HttpResponse::Ok()
       .append_header(ContentType::json())
-      .body(serialized)
+      .body(serialized),
   )
 }
 
 #[get("/list-units")]
-async fn list_units(
-  state: web::Data<AppState<'static>>
-) -> Result<impl Responder, ApiError> {
+async fn list_units(state: web::Data<AppState<'static>>) -> Result<impl Responder, ApiError> {
   let dbus = state.dbus.lock().unwrap();
   let units = functions::list_units(&dbus)?;
 
@@ -33,7 +28,7 @@ async fn list_units(
 
   Ok(
     HttpResponse::Ok()
-    .append_header(ContentType::json())
-    .body(serialized)
+      .append_header(ContentType::json())
+      .body(serialized),
   )
 }

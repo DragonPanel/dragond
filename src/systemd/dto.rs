@@ -12,10 +12,10 @@ type ExecDataTuple = (String, Vec<String>, bool, u64, u64, u64, u64, u32, i32, i
 #[serde(rename_all = "camelCase")]
 pub struct ExecData {
   pub path_to_binary: String,
-  
+
   /// Arguments passed to binary
   pub args: Vec<String>,
-  
+
   /// a boolean whether it should be considered a failure if the process exits uncleanly
   pub should_unclean_exit_mean_failure: bool,
 
@@ -35,7 +35,7 @@ pub struct ExecData {
 
   /// This is SIGCHLD
   /// Defined in linux kernel as
-  /// 
+  ///
   /// ```c
   /// #define __SI_CHLD	(4 << 16)
   /// // ...
@@ -44,10 +44,10 @@ pub struct ExecData {
   /// #define CLD_DUMPED	(__SI_CHLD|3)	/* child terminated abnormally */
   /// #define CLD_TRAPPED	(__SI_CHLD|4)	/* traced child has trapped */
   /// #define CLD_STOPPED	(__SI_CHLD|5)	/* child has stopped */
-  /// #define CLD_CONTINUED	(__SI_CHLD|6)	/* stopped child has continued */ 
-  /// 
+  /// #define CLD_CONTINUED	(__SI_CHLD|6)	/* stopped child has continued */
+  ///
   /// But from what I saw systemd just returns `1, 2, 3, 4, 5, 6`
-  /// ``` 
+  /// ```
   pub last_exit_code: i32,
 
   /// Last **process** return/exit code. 0 - success
@@ -179,7 +179,18 @@ impl ServiceDto {
   }
 }
 
-pub type UnitListEntryTuple = (String, String, String, String, String, String, dbus::Path<'static>, u32, String, dbus::Path<'static>);
+pub type UnitListEntryTuple = (
+  String,
+  String,
+  String,
+  String,
+  String,
+  String,
+  dbus::Path<'static>,
+  u32,
+  String,
+  dbus::Path<'static>,
+);
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -212,22 +223,22 @@ pub struct UnitListEntry {
   pub queued_job_type: String,
 
   /// The job object path
-  pub queued_job_object_path: String
+  pub queued_job_object_path: String,
 }
 
 impl From<UnitListEntryTuple> for UnitListEntry {
   fn from(value: UnitListEntryTuple) -> Self {
-      Self {
-        name: value.0,
-        description: value.1,
-        load_state: value.2,
-        active_state: value.3,
-        sub_state: value.4,
-        followed: value.5,
-        object_path: value.6.deref().to_owned(),
-        queued_job_id: value.7,
-        queued_job_type: value.8,
-        queued_job_object_path: value.9.deref().to_owned()
-      }
+    Self {
+      name: value.0,
+      description: value.1,
+      load_state: value.2,
+      active_state: value.3,
+      sub_state: value.4,
+      followed: value.5,
+      object_path: value.6.deref().to_owned(),
+      queued_job_id: value.7,
+      queued_job_type: value.8,
+      queued_job_object_path: value.9.deref().to_owned(),
+    }
   }
 }
