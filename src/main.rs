@@ -19,6 +19,7 @@ async fn main() -> std::io::Result<()> {
         .service(
             web::scope("/systemd")
             .service(systemd::routes::load_unit)
+            .service(systemd::routes::list_units)
         )
     })
     .bind(("0.0.0.0", 1337))?

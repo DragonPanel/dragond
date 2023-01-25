@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use sysinfo::{Pid, PidExt, ProcessExt, System, SystemExt};
 
 use serde::Serialize;
@@ -81,8 +83,15 @@ pub struct UnitDto {
   pub description: String,
   pub documentation: Vec<String>,
   pub triggered_by: Vec<String>,
+
+  /// i.e. whether the unit file has been loaded successfully  
   pub load_state: String,
+
+  /// i.e. whether the unit is currently started or not
   pub active_state: String,
+
+  /// a more fine-grained version of the active state that is specific to the unit type, which the active state is not
+  pub sub_state: String,
   pub load_error: (String, String),
   pub fragment_path: String,
   pub unit_file_state: String,
@@ -109,6 +118,7 @@ impl UnitDto {
       triggered_by: proxy.triggered_by()?,
       load_state: proxy.load_state()?,
       active_state: proxy.active_state()?,
+      sub_state: proxy.sub_state()?,
       load_error: proxy.load_error()?,
       fragment_path: proxy.fragment_path()?,
       unit_file_state: proxy.unit_file_state()?,
@@ -166,5 +176,58 @@ impl ServiceDto {
       // Extra properties are provided by me, they do not come from DBus
       extra_main_name,
     })
+  }
+}
+
+pub type UnitListEntryTuple = (String, String, String, String, String, String, dbus::Path<'static>, u32, String, dbus::Path<'static>);
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct UnitListEntry {
+  /// The primary unit name
+  pub name: String,
+
+  /// The human readable description
+  pub description: String,
+
+  /// i.e. whether the unit file has been loaded successfully
+  pub load_state: String,
+
+  /// i.e. whether the unit is currently started or not
+  pub active_state: String,
+
+  /// a more fine-grained version of the active state that is specific to the unit type, which the active state is not
+  pub sub_state: String,
+
+  /// A unit that is being followed in its state by this unit, if there is any, otherwise the empty string.
+  pub followed: String,
+
+  /// The unit object path
+  pub object_path: String,
+
+  /// If there is a job queued for the job unit, the numeric job id, 0 otherwise
+  pub queued_job_id: u32,
+
+  /// The job type as string
+  pub queued_job_type: String,
+
+  /// The job object path
+  pub queued_job_object_path: String
+}
+
+impl From<UnitListEntryTuple> for UnitListEntry {
+  fn from(value: UnitListEntryTuple) -> Self {
+      Self {
+        name: value.0,
+        description: value.1,
+        load_state: value.2,
+        active_state: value.3,
+        sub_state: value.4,
+        followed: value.5,
+        object_path: value.6.deref().to_owned(),
+        queued_job_id: value.7,
+        queued_job_type: value.8,
+        queued_job_object_path: value.9.deref().to_owned()
+      }
   }
 }
