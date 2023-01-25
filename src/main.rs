@@ -1,10 +1,13 @@
-mod systemd;
+#[macro_use]
+extern crate serde_derive;
+
 mod api_errors;
-mod dbus_interface;
 mod app_state;
+mod dbus_interface;
+mod systemd;
 
 use crate::app_state::AppState;
-use actix_web::{web, App, HttpServer, middleware::Logger};
+use actix_web::{middleware::Logger, web, App, HttpServer};
 use dbus_interface::DBusInterface;
 use env_logger::Env;
 use std::sync::Mutex;

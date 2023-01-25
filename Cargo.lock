@@ -440,6 +440,7 @@ dependencies = [
  "env_logger",
  "log",
  "serde",
+ "serde_derive",
  "serde_json",
  "sysinfo",
 ]
