@@ -70,7 +70,7 @@ impl From<ExecDataTuple> for ExecData {
 }
 
 fn exec_data_tuple_vec_to_struct(data: Vec<ExecDataTuple>) -> Vec<ExecData> {
-  data.into_iter().map(|x| ExecData::from(x)).collect()
+  data.into_iter().map(ExecData::from).collect()
 }
 
 #[derive(Serialize)]
