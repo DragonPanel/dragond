@@ -35,12 +35,3 @@ async fn read_latest(
       .body(output.stdout),
   )
 }
-
-#[get("/status")]
-async fn status() -> Result<impl Responder, ApiError> {
-  Ok(
-    HttpResponse::Ok()
-      .append_header(ContentType::plaintext())
-      .body("ON"),
-  )
-}
