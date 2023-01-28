@@ -41,7 +41,7 @@ async fn main() -> std::io::Result<()> {
       )
       .service(
         web::scope("/journald")
-          .service(journald::routes::read_latest)
+          .service(journald::routes::unit_logs)
       )
   })
   .bind((host, port))?;

@@ -1,37 +1,24 @@
-use crate::{api_errors::ApiError, journald::functions, AppState};
+use crate::{api_errors::ApiError, journald::functions};
 use actix_web::{get, http::header::ContentType, web, web::Query, HttpResponse, Responder};
-use std::process::Command;
 
 #[derive(Deserialize)]
 struct Info {
-  number: isize,
+  lines_number: Option<usize>,
 }
 
-#[get("/read-latest/{name}")]
-async fn read_latest(
+#[get("/unit-logs/{name}")]
+async fn unit_logs(
   path: web::Path<String>,
   info: Query<Info>,
 ) -> Result<impl Responder, ApiError> {
-  let name = path;
-  let lines_num = info.number;
-  debug!(target: "app_events", "input params: unit name {}, num of lines {}", &name, &lines_num);
+  let name = path; //TODO checking if unit exists and returning appropriate http error if not
+  let lines_number = info.lines_numbernumber.unwrap_or(1);
 
-  //TODO Extract this into functions file
-  let output = Command::new("journalctl")
-    .arg("--no-pager")
-    .arg("-r")
-    .args(["-u", &name])
-    .args(["-o", "json"])
-    .args(["-n", &lines_num.to_string()])
-    .output()
-    .expect("failure in executing journalctl");
-
-  info!("read_latest {}", &output.status);
-  // let serialized = serde_json::to_string(&output.stdout).unwrap_or("{}".to_owned());
+  let response_body = functions::read_n_latest_lines(&name, &lines_number);
 
   Ok(
     HttpResponse::Ok()
       .append_header(ContentType::json())
-      .body(output.stdout),
+      .body(response_body.unwrap().to_string()),
   )
 }
