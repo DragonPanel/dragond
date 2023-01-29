@@ -4,8 +4,8 @@ extern crate serde_derive;
 mod api_errors;
 mod app_state;
 mod dbus_interface;
-mod systemd;
 mod journald;
+mod systemd;
 
 use crate::app_state::AppState;
 use actix_web::{middleware::Logger, web, App, HttpServer};
@@ -39,10 +39,7 @@ async fn main() -> std::io::Result<()> {
           .service(systemd::routes::load_unit)
           .service(systemd::routes::list_units),
       )
-      .service(
-        web::scope("/journald")
-          .service(journald::routes::unit_logs)
-      )
+      .service(web::scope("/journald").service(journald::routes::unit_logs))
   })
   .bind((host, port))?;
   info!("Server bound on {}:{}", host, port);

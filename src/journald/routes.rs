@@ -4,17 +4,15 @@ use actix_web::{get, http::header::ContentType, web, web::Query, HttpResponse, R
 #[derive(Deserialize)]
 struct Info {
   lines_number: Option<usize>,
+  cursor: Option<String>,
 }
 
 #[get("/unit-logs/{name}")]
-async fn unit_logs(
-  path: web::Path<String>,
-  info: Query<Info>,
-) -> Result<impl Responder, ApiError> {
-  let name = path; //TODO checking if unit exists and returning appropriate http error if not
-  let lines_number = info.lines_numbernumber.unwrap_or(1);
+async fn unit_logs(path: web::Path<String>, info: Query<Info>) -> Result<impl Responder, ApiError> {
+  let info = info.into_inner();
+  let name = path.to_string(); //TODO checking if unit exists and returning appropriate http error if not
 
-  let response_body = functions::read_n_latest_lines(&name, &lines_number);
+  let response_body = functions::read_lines(&name, &info.lines_number, &info.cursor);
 
   Ok(
     HttpResponse::Ok()

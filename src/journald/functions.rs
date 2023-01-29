@@ -1,20 +1,33 @@
 use std::process::Command;
 use std::string::String;
 
+/// Reads journal entries for specified unit. The .service suffix can be omitted.
+///
+/// If lines_num is provided, reads only that amount of entries.
+/// If cursor is provided, reads entries since that cursor.
+///
+/// In case of error when executing command, return exit code.
+///
+pub fn read_lines(
+  unit_name: &String,
+  lines_num: &Option<usize>,
+  cursor: &Option<String>,
+) -> Result<String, i32> {
+  let mut command = Command::new("journalctl");
+  command.arg("--no-pager");
+  command.arg("--reverse");
+  command.args(["--output", "json"]);
+  command.args(["--unit", &unit_name]);
 
-/// Reads specified amount of latest log lines for specific unit from journal and return it as string with json formatting
-///
-/// Takes a unit name and a desired number of lines. The '.service' suffix can be omitted
-/// Return exit code in case of error.
-///
-pub fn read_n_latest_lines(unit_name: &str, lines_num: &usize) -> Result<String, i32> {
-  let output = Command::new("journalctl")
-    .arg("--no-pager")
-    .arg("-r")
-    .args(["-o", "json"])
-    .args(["-u", &unit_name])
-    .args(["-n", &lines_num.to_string()])
-    .output();
+  if cursor.is_some() {
+    command.args(["--cursor", cursor.as_ref().unwrap()]);
+  }
+
+  if lines_num.is_some() {
+    command.args(["--lines", &lines_num.unwrap().to_string()]);
+  }
+
+  let output = command.output();
 
   //TODO in case of error, returning both status code and error msg
   if output.is_err() {
@@ -29,7 +42,7 @@ pub fn read_n_latest_lines(unit_name: &str, lines_num: &usize) -> Result<String,
   // replaces newlines with commas and adds square brackets to end and beginning
   let mut command_stdout = output.unwrap().stdout;
   for character in &mut command_stdout {
-    if character.eq_ignore_ascii_case(&10)  {
+    if character.eq_ignore_ascii_case(&10) {
       *character = 44;
     }
   }
@@ -42,4 +55,3 @@ pub fn read_n_latest_lines(unit_name: &str, lines_num: &usize) -> Result<String,
 
   Ok(command_output.to_string())
 }
-
