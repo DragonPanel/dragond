@@ -40,18 +40,9 @@ pub fn read_lines(
   }
 
   // replaces newlines with commas and adds square brackets to end and beginning
-  let mut command_stdout = output.unwrap().stdout;
-  for character in &mut command_stdout {
-    if character.eq_ignore_ascii_case(&10) {
-      *character = 44;
-    }
-  }
-  command_stdout.push(93);
-  command_stdout.reverse();
-  command_stdout.push(91);
-  command_stdout.reverse();
+  let mut command_stdout = String::from_utf8_lossy(&output.unwrap().stdout).to_string();
+  command_stdout = format!("[{}]", command_stdout);
+  command_stdout = command_stdout.replace("\n", ",");
 
-  let command_output = String::from_utf8_lossy(&command_stdout);
-
-  Ok(command_output.to_string())
+  Ok(command_stdout)
 }
