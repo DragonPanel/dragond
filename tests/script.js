@@ -60,6 +60,22 @@ function journald() {
 }
 
 function journald_unit_logs() {
+    let without_query_res = http.get(base_endpoint + '/journald' + '/unit-logs/systemd-journald.service', { responseCallback: only200callback });
+
+    test_if_json(without_query_res);
+    check(without_query_res, {
+        'does request without query params return only one entry': (r) => {
+            return r.length == 1;
+        },
+    });
+
+    let five_latest_res = http.get(base_endpoint + '/journald' + '/unit-logs/systemd-journald.service?lines_number=5', { responseCallback: only200callback });
+    test_if_json(five_latest_res);
+    check(without_query_res, {
+        'does request with lines_num=5 return five entries': (r) => {
+            return r.length == 5;
+        },
+    });
 }
 
 function test_if_json(res) {
