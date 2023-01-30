@@ -46,6 +46,13 @@ function systemd_load_unit() {
             return body.loadState == 'loaded';
         },
     });
+
+    let invalid_unit_res = http.get(base_endpoint + '/systemd' + '/load-unit/non-existing.service');
+    check(invalid_unit_res, {
+        'is return code 404 when loading non existing unit': (r) => {
+            return res.status == 404;
+        },
+    });
 }
 
 function journald() {
