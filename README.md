@@ -1,10 +1,11 @@
-# HTTP API for various Linux programs
+# A simple HTTP API for interacting with systemd service manager and adjacent daemons.
 
-I will put more info here when it will be more complete.
+Basically it's an API to manipulate Linux needed for my very WIP administration panel for Linux - Dragon Panel!
 
-Basically it's an API to manipulate Linux needed for my very very WIP administration panel for Linux - Dragon Panel!
+## Testing
 
-Test
+API tests are done using k6. All tests for the whole daemon are packaged in one file.\
+Just cd into `tests` dir and run `k6 run script.js`. 
 
 ## LICENSE
 AGPLv3
