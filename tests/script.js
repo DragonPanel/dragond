@@ -11,15 +11,15 @@ export default function () {
 
 function systemd() {
     group('list-units', systemd_list_units);
-    group('load-unit', systemd_load_unit)
+    group('load-unit', systemd_load_unit);
 }
 
 function systemd_list_units() {
-    let list_units_res = http.get(base_endpoint + '/systemd' + '/list-units', { responseCallback: only200callback });
+    let res = http.get(base_endpoint + '/systemd' + '/list-units', { responseCallback: only200callback });
 
-    test_if_json(list_units_res);
+    test_if_json(res);
 
-    check(list_units_res, {
+    check(res, {
         'is journald service present': (r) => {
             const body = r.json();
 
@@ -35,6 +35,17 @@ function systemd_list_units() {
 }
 
 function systemd_load_unit() {
+    let res = http.get(base_endpoint + '/systemd' + '/load-unit/systemd-journald.service', { responseCallback: only200callback });
+
+    test_if_json(res);
+
+    check(res, {
+        'is journald service loaded': (r) => {
+            const body = r.json();
+
+            return body.loadState == 'loaded';
+        },
+    });
 }
 
 function journald() {
