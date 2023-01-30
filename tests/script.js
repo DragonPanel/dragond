@@ -74,13 +74,14 @@ function test_if_json(res) {
             }
         },
         'is body a valid json': (r) => {
-            const bodyJsoned = r.json();
-            if(typeof bodyJsoned == 'object') {
-                return true;
-            } else {
-                console.error('was unable to parse body as JSON');
+            let body_as_json;
+            try {
+                body_as_json = r.json();
+            } catch(e) {
                 return false;
             }
+
+            return typeof body_as_json == 'object';
         },
     });
 }
